@@ -1,13 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const API_URL = process.env.API_URL!;
-const allowedOrigins = ["http://localhost:3000", "https://edit.onlinefreecv.com"];
+const allowedOrigins = ["http://localhost:3000"];
+
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  if (!origin) return false;
+  const regex = /^https:\/\/([a-zA-Z0-9-]+\.)?onlinefreecv\.com$/;
+  return regex.test(origin) || allowedOrigins.includes(origin);
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const origin = req.headers.origin;
 
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
+  if (isAllowedOrigin(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin!);
   }
 
   res.setHeader("Vary", "Origin");
