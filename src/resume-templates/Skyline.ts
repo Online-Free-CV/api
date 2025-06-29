@@ -15,6 +15,12 @@ export type TimelineEntry = {
   subtitle?: string;
 };
 
+export type SimpleList = {
+  title: string;
+  tags: string[];
+  description?: string;
+};
+
 export type Skill = {
   name: string;
   level: number;
@@ -36,6 +42,8 @@ export type UserData = {
   location: string;
   current_position: string;
   skills?: Skill[];
+  languages?: SimpleList[];
+  hobbies?: SimpleList[];
   references: TimelineEntry[];
   experiences: TimelineEntry[];
   educations: TimelineEntry[];
@@ -49,6 +57,16 @@ export function getSkylineResumeHtml(user: UserData): string {
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Ccircle cx='64' cy='64' r='64' fill='%23cccccc'/%3E%3Cpath d='M64 72c13.3 0 24-10.7 24-24S77.3 24 64 24 40 34.7 40 48s10.7 24 24 24zm0 8c-16 0-48 8-48 24v8h96v-8c0-16-32-24-48-24z' fill='%23ffffff'/%3E%3C/svg%3E";
 
   const list = (items: Skill[]) => items.slice(0, 5).map(i => `<li>${i.name}</li>`).join("");
+  const listLanguages = (items: SimpleList[]) => items.slice(0, 5).map(i => i.title !== "" ? `<li style="
+    display: flex;
+    justify-content: space-between;
+">${i.title}<span style="padding: .25rem .5rem; border-radius:9999px; color: white; background: ${user.themeColor.base}">${i.tags[0]}</span></li>` : null).join("");
+  const listHobbies = (items: SimpleList[]) => items.slice(0, 5).map((i, index) => i.title !== "" ? `<li style="
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0px;
+    ${index !== 4 ? "border-bottom: 1px solid #dcdcdc66;" : ""};
+"><strong>${i.title}</strong><p style="margin: 0.5rem 0px 0px;">${i.description}</p></li>` : null).join("");
 
   const timeline = (entries: TimelineEntry[]) => entries.map(e => `
     <div class="timeline-entry">
@@ -239,6 +257,8 @@ export function getSkylineResumeHtml(user: UserData): string {
         <li><strong>Location:</strong> ${user.location}</li>
       </ul></div>
       ${user.skills?.length ? `<div class="section"><h3>SKILLS</h3><ul>${list(user.skills)}</ul></div>` : ""}
+      ${user.languages?.length ? `<div class="section"><h3>LANGUAGES</h3><ul>${listLanguages(user.languages)}</ul></div>` : ""}
+      ${user.hobbies?.length ? `<div class="section"><h3>HOBBIES</h3><ul>${listHobbies(user.hobbies)}</ul></div>` : ""}
     </div>
 
     <div class="main">
